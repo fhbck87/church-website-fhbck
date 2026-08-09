@@ -1,0 +1,302 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║        🎉 CHURCH WEBSITE - READY FOR HOSTINGER DEPLOYMENT 🎉             ║
+║                                                                           ║
+║                    Domain: fhbckissimmee.org                             ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+✅ GITHUB DEPLOYMENT COMPLETE!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Changes pushed to:
+  📍 Repository: https://github.com/fhbck87/church-website-fhbck
+  📍 Latest commit: Hostinger deployment configuration + fhbckissimmee.org guide
+
+Files created:
+  ✅ hostinger-deploy.sh - Automated deployment script
+  ✅ docker-compose.hostinger.yml - Production Docker configuration
+  ✅ nginx/default.hostinger.conf - Production nginx config with SSL
+  ✅ HOSTINGER_DEPLOYMENT_GUIDE.md - Complete deployment manual
+  ✅ HOSTINGER_DEPLOY_INSTRUCTIONS_FHBCKISSIMMEE.md - Domain-specific guide
+  ✅ HOSTINGER_QUICK_CHECKLIST.md - Before/after deployment checklist
+
+
+🚀 DEPLOY TO HOSTINGER - 9 SIMPLE STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Total time: ~15-20 minutes
+
+STEP 1️⃣  DNS CONFIGURATION
+───────────────────────────────────────────────────────────────────────────
+📍 Link: https://hpanel.hostinger.com/email/fhbckissimmee.org/connect-domain
+
+Add these DNS records in Hostinger Control Panel:
+
+  A Record:
+  • Name: @ (root)
+  • Type: A
+  • Value: [Your VPS IP from Hostinger]
+  
+  CNAME Record:
+  • Name: www
+  • Type: CNAME
+  • Value: fhbckissimmee.org
+
+Wait 5-30 minutes for DNS propagation.
+
+
+STEP 2️⃣  SSH INTO VPS
+───────────────────────────────────────────────────────────────────────────
+$ ssh root@[Your VPS IP]
+
+
+STEP 3️⃣  INSTALL DOCKER (Copy-paste into terminal)
+───────────────────────────────────────────────────────────────────────────
+apt update && apt upgrade -y
+curl -fsSL https://get.docker.com | sh
+curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+docker --version
+docker-compose --version
+
+
+STEP 4️⃣  CLONE REPOSITORY
+───────────────────────────────────────────────────────────────────────────
+cd /opt
+git clone https://github.com/fhbck87/church-website-fhbck.git church-website
+cd church-website
+
+
+STEP 5️⃣  RUN SETUP
+───────────────────────────────────────────────────────────────────────────
+sudo ./hostinger-deploy.sh setup
+
+✓ Creates .env.production
+✓ Generates secure database password
+✓ Generates JWT secret
+
+
+STEP 6️⃣  EDIT CONFIGURATION
+───────────────────────────────────────────────────────────────────────────
+nano .env.production
+
+Key values to update:
+  REACT_APP_API_URL=https://fhbckissimmee.org
+  REACT_APP_ADMIN_EMAIL=admin@fhbckissimmee.org
+  REACT_APP_ADMIN_PASSWORD=ChooseStrongPassword123!
+  MAIL_HOST=smtp.gmail.com
+  MAIL_USERNAME=your-email@gmail.com
+  MAIL_PASSWORD=your-app-password
+
+Save: Ctrl+X → Y → Enter
+
+
+STEP 7️⃣  SETUP SSL CERTIFICATE
+───────────────────────────────────────────────────────────────────────────
+sudo ./hostinger-deploy.sh ssl
+
+✓ Requests Let's Encrypt certificate
+✓ Auto-renewal configured
+
+
+STEP 8️⃣  COPY NGINX CONFIG
+───────────────────────────────────────────────────────────────────────────
+cp nginx/default.hostinger.conf nginx/default.conf
+
+
+STEP 9️⃣  DEPLOY!
+───────────────────────────────────────────────────────────────────────────
+sudo ./hostinger-deploy.sh deploy
+
+Wait for all services to start (5-10 minutes):
+  ✓ postgres running (church-db)
+  ✓ backend running (church-backend)
+  ✓ frontend running (church-frontend)
+  ✓ certbot running (church-certbot)
+
+Verify:
+  sudo ./hostinger-deploy.sh health
+
+
+🎯 YOUR WEBSITE IS NOW LIVE!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Access your site:
+  🌐 https://fhbckissimmee.org
+  🌐 https://www.fhbckissimmee.org
+
+Login to Admin Panel:
+  📧 Email: admin@fhbckissimmee.org
+  🔐 Password: (from .env.production)
+
+⚠️  IMPORTANT - Change password immediately after first login!
+
+
+📋 AFTER DEPLOYMENT CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+☐ Access https://fhbckissimmee.org in browser (should load)
+☐ Login to admin panel
+☐ CHANGE ADMIN PASSWORD immediately
+☐ Configure email settings
+☐ Test email notifications
+☐ Create database backup: sudo ./hostinger-deploy.sh backup
+☐ Monitor logs: sudo ./hostinger-deploy.sh logs
+
+
+📚 DOCUMENTATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In project root:
+  📄 HOSTINGER_DEPLOY_INSTRUCTIONS_FHBCKISSIMMEE.md - Your domain guide
+  📄 HOSTINGER_SETUP_SUMMARY.txt - General setup overview
+  📄 hostinger-deploy.sh - Deployment script with help
+
+In session folder:
+  📄 HOSTINGER_DEPLOYMENT_GUIDE.md - Complete 10-step guide
+  📄 HOSTINGER_QUICK_CHECKLIST.md - Pre/post deployment checklist
+  📄 README_HOSTINGER_SETUP.md - Architecture & maintenance
+
+
+🔧 USEFUL COMMANDS AFTER DEPLOYMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+View logs:
+  sudo ./hostinger-deploy.sh logs
+
+Backup database:
+  sudo ./hostinger-deploy.sh backup
+
+Restore database:
+  sudo ./hostinger-deploy.sh restore backup_file.sql
+
+Restart services:
+  sudo ./hostinger-deploy.sh restart backend
+
+Check health:
+  sudo ./hostinger-deploy.sh health
+
+Update code:
+  sudo ./hostinger-deploy.sh update
+
+Stop services:
+  sudo ./hostinger-deploy.sh stop
+
+
+🆘 TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ DNS not resolving?
+→ Wait 30 minutes, check with: dig fhbckissimmee.org
+→ Verify A record points to correct VPS IP
+
+❌ SSL certificate error?
+→ Run: sudo ./hostinger-deploy.sh ssl
+→ Check: sudo docker logs church-certbot
+
+❌ API not responding?
+→ Check logs: sudo ./hostinger-deploy.sh logs
+→ Verify CORS_ORIGINS in .env.production
+→ Restart: sudo ./hostinger-deploy.sh restart backend
+
+❌ Can't SSH to VPS?
+→ Check SSH key permissions: chmod 600 ~/.ssh/id_rsa
+→ Verify IP in Hostinger panel
+
+
+📞 SUPPORT & RESOURCES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Deployment script help:
+  sudo ./hostinger-deploy.sh help
+
+Docker documentation:
+  https://docs.docker.com
+
+Spring Boot documentation:
+  https://spring.io
+
+React documentation:
+  https://react.dev
+
+Hostinger support:
+  https://www.hostinger.com/support
+
+Let's Encrypt (SSL):
+  https://letsencrypt.org
+
+
+🏗️ ARCHITECTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─────────────────────────────────────────┐
+│  Internet (HTTPS)                       │
+└────────────────┬────────────────────────┘
+                 │
+        ┌────────▼─────────┐
+        │   Nginx (80/443) │
+        │  (reverse proxy) │
+        └────────┬─────────┘
+                 │
+    ┌────────────┴────────────┐
+    │                         │
+┌───▼────────────┐    ┌──────▼──────────┐
+│  React App     │    │ Spring Boot     │
+│  (static)      │    │ API (8080)      │
+└────────────────┘    └──────┬──────────┘
+                             │
+                      ┌──────▼──────┐
+                      │ PostgreSQL   │
+                      │ Database     │
+                      │ (5432)       │
+                      └──────────────┘
+
+
+📊 WHAT'S INCLUDED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ React Frontend
+   • Optimized static build
+   • Served via Nginx
+   • HTTPS with SSL certificate
+
+✅ Spring Boot Backend
+   • GraphQL API
+   • JWT authentication
+   • PostgreSQL integration
+
+✅ PostgreSQL Database
+   • Secure internal network
+   • Automatic backups
+   • Connection pooling
+
+✅ SSL/TLS Security
+   • Let's Encrypt certificates
+   • Auto-renewal every 90 days
+   • HSTS headers
+   • Security headers
+
+✅ Performance Optimization
+   • 1-year asset caching
+   • GZIP compression
+   • Proxy buffering
+   • Connection pooling
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+                    🚀 READY TO DEPLOY! 🚀
+
+                  Start with STEP 1: DNS Configuration
+              https://hpanel.hostinger.com/email/fhbckissimmee.org/...
+
+                        Estimated time: 15 minutes
+                      Your site will be live at:
+                    https://fhbckissimmee.org
+
+═══════════════════════════════════════════════════════════════════════════
+
+Questions? Check HOSTINGER_DEPLOY_INSTRUCTIONS_FHBCKISSIMMEE.md
+Last updated: 2026-08-09
+Status: ✅ READY FOR PRODUCTION
