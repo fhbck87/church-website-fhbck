@@ -1,0 +1,242 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    GITHUB ACTIONS - QUICK START GUIDE
+                      Church Website Auto-Deployment
+═══════════════════════════════════════════════════════════════════════════════
+
+STATUS: ✅ READY TO CONFIGURE (Workflow already created and pushed to GitHub)
+
+
+WHAT THIS DOES:
+═══════════════════════════════════════════════════════════════════════════════
+
+Every time you push code to GitHub, your Church Website automatically:
+  ✓ Builds backend Docker image
+  ✓ Builds frontend Docker image
+  ✓ Pushes to GitHub Container Registry
+  ✓ SSHes into Hostinger VPS
+  ✓ Backs up database
+  ✓ Deploys new services
+  ✓ Verifies health
+  ✓ Updates https://fhbckissimmee.org
+
+
+5-MINUTE SETUP:
+═══════════════════════════════════════════════════════════════════════════════
+
+1. GENERATE SSH KEY
+   
+   Local Machine:
+   $ ssh-keygen -t ed25519 -f ~/.ssh/github-actions-hostinger -C "github-actions"
+   (Press ENTER twice, no passphrase)
+   
+   Then:
+   $ cat ~/.ssh/github-actions-hostinger.pub
+
+
+2. ADD KEY TO HOSTINGER VPS
+   
+   $ ssh root@YOUR_VPS_IP
+   $ mkdir -p ~/.ssh
+   $ echo "PASTE_YOUR_PUBLIC_KEY_HERE" >> ~/.ssh/authorized_keys
+   $ chmod 600 ~/.ssh/authorized_keys
+
+
+3. VERIFY SSH WORKS
+   
+   $ ssh -i ~/.ssh/github-actions-hostinger root@YOUR_VPS_IP "echo OK"
+   (Should respond with: OK)
+
+
+4. ADD GITHUB SECRETS
+   
+   https://github.com/fhbck87/church-website-fhbck/settings/secrets/actions
+   
+   Click "New repository secret" and add:
+   
+   VPS CONNECTION (Required):
+   ├─ HOSTINGER_VPS_HOST: (your VPS IP address)
+   ├─ HOSTINGER_VPS_USER: root
+   ├─ HOSTINGER_VPS_SSH_KEY: (entire private key from ~/.ssh/github-actions-hostinger)
+   └─ HOSTINGER_VPS_PORT: 22
+   
+   APPLICATION CONFIG (Required):
+   ├─ REACT_APP_API_URL: https://fhbckissimmee.org
+   ├─ CORS_ORIGINS: https://fhbckissimmee.org,https://www.fhbckissimmee.org
+   ├─ DB_PASSWORD: (from .env.production on VPS)
+   ├─ JWT_SECRET: (from .env.production on VPS)
+   ├─ REACT_APP_ADMIN_EMAIL: admin@fhbckissimmee.org
+   ├─ REACT_APP_ADMIN_PASSWORD: (from .env.production on VPS)
+   ├─ REACT_APP_ADMIN_NAME: Administrator
+   ├─ MAIL_HOST: smtp.gmail.com
+   ├─ MAIL_PORT: 587
+   ├─ MAIL_USERNAME: (your email)
+   ├─ MAIL_PASSWORD: (from .env.production on VPS)
+   └─ MAIL_NOTIFY_TO: info@fhbckissimmee.org
+
+
+5. TEST DEPLOYMENT
+   
+   https://github.com/fhbck87/church-website-fhbck/actions
+   
+   ✓ Click "Deploy to Hostinger VPS" workflow
+   ✓ Click "Run workflow" button
+   ✓ Watch the deployment in real-time
+
+
+6. VERIFY LIVE
+   
+   https://fhbckissimmee.org
+   (Should load your website)
+
+
+GETTING SECRETS FROM VPS:
+═══════════════════════════════════════════════════════════════════════════════
+
+SSH into VPS and run:
+
+$ ssh root@YOUR_VPS_IP
+$ cat /opt/church-website/.env.production
+
+Copy the values you need for GitHub secrets.
+
+
+HOW TO USE (After Configuration):
+═══════════════════════════════════════════════════════════════════════════════
+
+AUTOMATIC DEPLOYMENT (Recommended):
+  $ git commit -am "My changes"
+  $ git push origin master
+  → Workflow automatically triggered
+  → Watch at: https://github.com/fhbck87/church-website-fhbck/actions
+
+MANUAL DEPLOYMENT (Anytime):
+  1. Go to: https://github.com/fhbck87/church-website-fhbck/actions
+  2. Click "Deploy to Hostinger VPS"
+  3. Click "Run workflow"
+  4. Deployment starts immediately
+
+CHECK STATUS:
+  https://github.com/fhbck87/church-website-fhbck/actions
+  (Green checkmark = Success, Red X = Failed)
+
+
+TYPICAL WORKFLOW:
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Make changes locally:
+   $ code .
+   $ git add .
+   $ git commit -m "Add new feature"
+
+2. Push to GitHub:
+   $ git push origin master
+
+3. GitHub Actions automatically:
+   ✓ Builds images (10-15 min)
+   ✓ Deploys to VPS (5-10 min)
+   ✓ Verifies health
+
+4. Your site updates:
+   https://fhbckissimmee.org
+
+
+MONITORING DEPLOYMENTS:
+═══════════════════════════════════════════════════════════════════════════════
+
+REAL-TIME LOGS:
+  https://github.com/fhbck87/church-website-fhbck/actions
+  → Click latest run
+  → Expand "Deploy to Hostinger via SSH"
+  → Watch logs scroll in real-time
+
+VPS LOGS:
+  SSH into VPS:
+  $ docker-compose -f docker-compose.hostinger.yml logs -f
+
+CHECK SERVICES:
+  $ docker-compose -f docker-compose.hostinger.yml ps
+
+
+TROUBLESHOOTING:
+═══════════════════════════════════════════════════════════════════════════════
+
+❌ "Permission denied (publickey)"
+  → Check SSH key added to VPS: cat ~/.ssh/authorized_keys
+  → Verify HOSTINGER_VPS_SSH_KEY secret contains full private key
+  → Check key permissions: chmod 600 ~/.ssh/authorized_keys
+
+❌ "Secrets not found"
+  → Wait 5 minutes after adding secrets
+  → Check secret names are exactly correct (case-sensitive)
+  → Ensure you're in the right repository
+
+❌ Build fails
+  → Check GitHub Actions logs for error details
+  → Test build locally: docker build -f backend/Dockerfile backend
+
+❌ Services don't start
+  → SSH into VPS: docker-compose -f docker-compose.hostinger.yml logs
+  → Check .env.production values are correct
+  → Verify disk space: df -h
+
+
+DOCUMENTATION:
+═══════════════════════════════════════════════════════════════════════════════
+
+Complete Setup Guide:
+  GITHUB_ACTIONS_SETUP.md (in project root)
+
+Interactive Setup Helper:
+  ./github-actions-setup.sh
+
+Hostinger Deployment:
+  HOSTINGER_DEPLOY_INSTRUCTIONS_FHBCKISSIMMEE.md
+
+Architecture & Overview:
+  DEPLOY_NOW.txt
+
+
+SECURITY:
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ SSH Key: Dedicated for GitHub Actions only
+✅ Secrets: Encrypted by GitHub, never logged
+✅ Database: Automatic backup before deployment
+✅ Access: Only repository admins can configure
+✅ Monitoring: All deployments logged and traceable
+
+
+WORKFLOW FILE:
+═══════════════════════════════════════════════════════════════════════════════
+
+Location: .github/workflows/deploy.yml
+
+Features:
+  ✓ Builds backend & frontend Docker images
+  ✓ Pushes to GitHub Container Registry
+  ✓ Deploys via SSH to Hostinger VPS
+  ✓ Backs up database automatically
+  ✓ Health checks and verification
+  ✓ Error handling and notifications
+
+
+QUICK LINKS:
+═══════════════════════════════════════════════════════════════════════════════
+
+Workflow Runs:      https://github.com/fhbck87/church-website-fhbck/actions
+Add Secrets:        https://github.com/fhbck87/church-website-fhbck/settings/secrets/actions
+Live Site:          https://fhbckissimmee.org
+Repository:         https://github.com/fhbck87/church-website-fhbck
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+                            READY TO GO! 🚀
+
+              Follow the 5-Minute Setup steps above to enable
+                    automatic deployments to Hostinger.
+
+                  Once configured, just push code to GitHub
+              and your site automatically updates!
+
+═══════════════════════════════════════════════════════════════════════════════
