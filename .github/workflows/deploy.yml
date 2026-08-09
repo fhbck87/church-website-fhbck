@@ -114,7 +114,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_VPS_USER }}
           key: ${{ secrets.HOSTINGER_VPS_SSH_KEY }}
           port: ${{ secrets.HOSTINGER_VPS_PORT || 22 }}
-          script_stop_on_error: true
+          script_stop: true
           script: |
             set -e
             
