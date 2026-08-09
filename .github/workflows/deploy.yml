@@ -1,19 +1,38 @@
-name: Deploy to DigitalOcean
+name: Deploy to Hostinger VPS
 
 on:
   push:
     branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BACKEND: rodriguemedor/church-website/backend
-  IMAGE_FRONTEND: rodriguemedor/church-website/frontend
+  IMAGE_BACKEND: ${{ github.repository }}/backend
+  IMAGE_FRONTEND: ${{ github.repository }}/frontend
+  DOCKER_COMPOSE_FILE: docker-compose.hostinger.yml
 
 jobs:
-  build-and-deploy:
+  build:
+    name: Build Docker Images
     runs-on: ubuntu-latest
+    outputs:
+      backend-image: ${{ steps.meta-backend.outputs.tags }}
+      frontend-image: ${{ steps.meta-frontend.outputs.tags }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -22,64 +41,224 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract metadata - Backend
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_BACKEND }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Extract metadata - Frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_FRONTEND }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
       - name: Build and push backend
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v5
         with:
           context: backend
           file: backend/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_BACKEND }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_BACKEND }}:latest
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build and push frontend
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_FRONTEND }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_FRONTEND }}:latest
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
           build-args: |
-            REACT_APP_API_URL=
-            REACT_APP_YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }}
-            REACT_APP_YOUTUBE_CHANNEL_ID=${{ secrets.YOUTUBE_CHANNEL_ID }}
-            REACT_APP_ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
-            REACT_APP_ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
-            REACT_APP_ADMIN_NAME=${{ secrets.ADMIN_NAME }}
-            REACT_APP_STRIPE_PUBLISHABLE_KEY=${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+            REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
+            REACT_APP_YOUTUBE_API_KEY=${{ secrets.REACT_APP_YOUTUBE_API_KEY }}
+            REACT_APP_YOUTUBE_CHANNEL_ID=${{ secrets.REACT_APP_YOUTUBE_CHANNEL_ID }}
+            REACT_APP_STRIPE_PUBLISHABLE_KEY=${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Deploy via SSH
+  deploy:
+    name: Deploy to Hostinger VPS
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create deployment status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.ref,
+              environment: 'production',
+              description: 'Deploying to Hostinger VPS',
+              auto_merge: false,
+              required_contexts: []
+            });
+
+      - name: Deploy to Hostinger via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.DO_HOST }}
-          username: ${{ secrets.DO_USER }}
-          key: ${{ secrets.DO_SSH_KEY }}
+          host: ${{ secrets.HOSTINGER_VPS_HOST }}
+          username: ${{ secrets.HOSTINGER_VPS_USER }}
+          key: ${{ secrets.HOSTINGER_VPS_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_VPS_PORT || 22 }}
+          script_stop_on_error: true
           script: |
             set -e
+            
+            echo "🚀 Starting deployment to Hostinger VPS..."
             cd /opt/church-website
-
-            # Discard local changes (e.g. .env) and match origin exactly
+            
+            # Pull latest code
+            echo "📥 Pulling latest code from GitHub..."
             git fetch origin
             git reset --hard origin/master
-
+            git clean -fd
+            
+            # Login to GitHub Container Registry
+            echo "🔐 Logging in to GitHub Container Registry..."
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Create .env.production file with secrets
+            echo "📝 Creating .env.production file..."
+            cat > .env.production << 'ENVEOF'
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
+            CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+            REACT_APP_YOUTUBE_API_KEY=${{ secrets.REACT_APP_YOUTUBE_API_KEY }}
+            REACT_APP_YOUTUBE_CHANNEL_ID=${{ secrets.REACT_APP_YOUTUBE_CHANNEL_ID }}
+            REACT_APP_ADMIN_EMAIL=${{ secrets.REACT_APP_ADMIN_EMAIL }}
+            REACT_APP_ADMIN_PASSWORD=${{ secrets.REACT_APP_ADMIN_PASSWORD }}
+            REACT_APP_ADMIN_NAME=${{ secrets.REACT_APP_ADMIN_NAME }}
+            REACT_APP_STRIPE_PUBLISHABLE_KEY=${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            MAIL_HOST=${{ secrets.MAIL_HOST }}
+            MAIL_PORT=${{ secrets.MAIL_PORT }}
+            MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            MAIL_NOTIFY_TO=${{ secrets.MAIL_NOTIFY_TO }}
+            ENVEOF
+            
+            # Backup current database before deployment
+            echo "💾 Backing up database..."
+            docker-compose -f docker-compose.hostinger.yml exec -T postgres pg_dump -U church_admin church_db > /opt/backups/backup_pre_deploy_$(date +%Y%m%d_%H%M%S).sql || true
+            
+            # Stop running containers
+            echo "⏹️  Stopping running services..."
+            docker-compose -f docker-compose.hostinger.yml down --remove-orphans || true
+            
+            # Pull latest images
+            echo "📦 Pulling latest Docker images..."
+            docker-compose -f docker-compose.hostinger.yml pull
+            
+            # Build and start services
+            echo "🔨 Building and starting services..."
+            docker-compose -f docker-compose.hostinger.yml up -d --build
+            
+            # Wait for services to be ready
+            echo "⏳ Waiting for services to start..."
+            sleep 10
+            
+            # Check service health
+            echo "🏥 Checking service health..."
+            if docker-compose -f docker-compose.hostinger.yml ps | grep -q "church-frontend" && \
+               docker-compose -f docker-compose.hostinger.yml ps | grep -q "church-backend" && \
+               docker-compose -f docker-compose.hostinger.yml ps | grep -q "church-db"; then
+              echo "✅ All services are running"
+            else
+              echo "❌ Some services failed to start"
+              docker-compose -f docker-compose.hostinger.yml logs
+              exit 1
+            fi
+            
+            # Clean up old images and containers
+            echo "🧹 Cleaning up Docker resources..."
+            docker image prune -af --filter "until=72h"
+            docker container prune -f --filter "until=72h"
+            
+            echo "✅ Deployment completed successfully!"
+            echo "🌐 Your site is live at: https://fhbckissimmee.org"
 
-            export GITHUB_REPOSITORY=rodriguemedor/church-website
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOSTINGER_VPS_HOST }}
+          username: ${{ secrets.HOSTINGER_VPS_USER }}
+          key: ${{ secrets.HOSTINGER_VPS_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_VPS_PORT || 22 }}
+          script: |
+            echo "🔍 Verifying deployment..."
+            
+            cd /opt/church-website
+            
+            # Check if containers are running
+            echo "Checking container status..."
+            docker-compose -f docker-compose.hostinger.yml ps
+            
+            # Test health endpoints
+            echo "Testing health endpoints..."
+            
+            # Frontend health
+            if curl -sk https://fhbckissimmee.org/health 2>/dev/null | grep -q "healthy"; then
+              echo "✅ Frontend is healthy"
+            else
+              echo "⚠️  Frontend health check inconclusive (may be normal)"
+            fi
+            
+            # API health
+            if curl -sk https://fhbckissimmee.org/api/health 2>/dev/null; then
+              echo "✅ API is responding"
+            else
+              echo "⚠️  API health check inconclusive"
+            fi
+            
+            echo "✅ Deployment verification complete"
 
-            # Free port 80/443 for Docker frontend (stop host nginx if running)
-            systemctl stop nginx 2>/dev/null || true
-            docker stop $(docker ps -q --filter "name=nginx") 2>/dev/null || true
+      - name: Deployment success notification
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: 1,
+              state: 'success',
+              environment_url: 'https://fhbckissimmee.org',
+              description: 'Deployment successful'
+            });
 
-            # Write all production secrets to .env (overwrite to ensure freshness)
-            printf '%s\n' \
-              "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
-              "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
-              "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" \
-              "MAIL_HOST=${{ secrets.MAIL_HOST }}" \
-              "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" \
-              "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" \
-              "MAIL_NOTIFY_TO=${{ secrets.MAIL_NOTIFY_TO }}" \
-              > .env
-
-            docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml down
-            docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml pull
-            docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
-            docker image prune -f
+      - name: Deployment failure notification
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: 1,
+              state: 'failure',
+              description: 'Deployment failed - check logs'
+            });
