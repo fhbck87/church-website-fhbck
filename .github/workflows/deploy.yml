@@ -23,6 +23,7 @@ env:
 permissions:
   contents: read
   packages: write
+  deployments: write
 
 jobs:
   build:
@@ -105,20 +106,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Create deployment status
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.ref,
-              environment: 'production',
-              description: 'Deploying to Hostinger VPS',
-              auto_merge: false,
-              required_contexts: []
-            });
 
       - name: Deploy to Hostinger via SSH
         uses: appleboy/ssh-action@v1.2.0
@@ -240,29 +227,16 @@ jobs:
             
             echo "✅ Deployment verification complete"
 
-      - name: Deployment success notification
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: 1,
-              state: 'success',
-              environment_url: 'https://fhbckissimmee.org',
-              description: 'Deployment successful'
-            });
-
-      - name: Deployment failure notification
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: 1,
-              state: 'failure',
-              description: 'Deployment failed - check logs'
-            });
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "🚀 Deployment Status"
+          echo "=========================================="
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful!"
+            echo "🌐 Site: https://fhbckissimmee.org"
+          else
+            echo "❌ Deployment failed - check logs above"
+          fi
+          echo "=========================================="
