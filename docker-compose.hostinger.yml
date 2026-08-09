@@ -1,0 +1,107 @@
+# Hostinger VPS Deployment Configuration
+# Optimized for Hostinger VPS with Docker support
+# Usage: docker-compose -f docker-compose.hostinger.yml up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: church-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: church_db
+      POSTGRES_USER: church_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-church_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Expose PostgreSQL only to docker network for security
+    networks:
+      - church-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U church_admin -d church_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: church-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/church_db
+      DB_USERNAME: church_admin
+      DB_PASSWORD: ${DB_PASSWORD:-church_pass}
+      JWT_SECRET: ${JWT_SECRET:-}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_NOTIFY_TO: ${MAIL_NOTIFY_TO:-info@fhbck.org}
+      UPLOAD_DIR: /app/uploads
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://fhbck.org,http://www.fhbck.org,https://fhbck.org,https://www.fhbck.org}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      SPRING_PROFILES_ACTIVE: production
+    volumes:
+      - uploads_data:/app/uploads
+      - logs_data:/app/logs
+    networks:
+      - church-network
+    # Internal port only - accessed via nginx proxy
+    expose:
+      - "8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-https://fhbck.org}
+        REACT_APP_YOUTUBE_API_KEY: ${REACT_APP_YOUTUBE_API_KEY:-}
+        REACT_APP_YOUTUBE_CHANNEL_ID: ${REACT_APP_YOUTUBE_CHANNEL_ID:-}
+        REACT_APP_ADMIN_EMAIL: ${REACT_APP_ADMIN_EMAIL:-}
+        REACT_APP_ADMIN_PASSWORD: ${REACT_APP_ADMIN_PASSWORD:-}
+        REACT_APP_ADMIN_NAME: ${REACT_APP_ADMIN_NAME:-}
+        REACT_APP_STRIPE_PUBLISHABLE_KEY: ${REACT_APP_STRIPE_PUBLISHABLE_KEY:-}
+    container_name: church-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl-params.conf:/etc/nginx/ssl-params.conf:ro
+      - certbot_certs:/etc/letsencrypt:rw
+      - certbot_web:/var/www/certbot:rw
+    depends_on:
+      - backend
+    networks:
+      - church-network
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: church-certbot
+    volumes:
+      - certbot_certs:/etc/letsencrypt:rw
+      - certbot_web:/var/www/certbot:rw
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - church-network
+
+networks:
+  church-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  uploads_data:
+    driver: local
+  logs_data:
+    driver: local
+  certbot_certs:
+    driver: local
+  certbot_web:
+    driver: local
