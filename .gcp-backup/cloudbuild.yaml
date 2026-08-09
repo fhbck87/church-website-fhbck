@@ -1,0 +1,32 @@
+#steps:
+#  # Docker Build
+#  - name: 'gcr.io/cloud-builders/docker'
+#    args: ['build', '-t',
+#           'us-central1-docker.pkg.dev/$_PROJECT_ID/my-docker-repo/myimage',
+#           '.']
+#
+#  # Docker Push
+#  - name: 'gcr.io/cloud-builders/docker'
+#    args: ['push',
+#           'us-central1-docker.pkg.dev/$_PROJECT_ID/my-docker-repo/myimage']
+#
+#  # Deploy to Compute Engine with container
+#  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#    entrypoint: 'gcloud'
+#    timeout: 240s
+#    args:
+#      - 'compute'
+#      - 'instances'
+#      - 'create-with-container'
+#      - 'my-vm-name'
+#      - '--container-image'
+#      - 'us-central1-docker.pkg.dev/$_PROJECT_ID/my-docker-repo/myimage'
+#      - '--zone=us-central1-a'
+#      - '--machine-type=e2-medium'
+#      - '--scopes=cloud-platform'
+#
+#substitutions:
+#  _PROJECT_ID: 'stoked-door-451819-s9'
+#
+#options:
+#  logging: CLOUD_LOGGING_ONLY

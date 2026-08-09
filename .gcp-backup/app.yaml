@@ -1,0 +1,27 @@
+##service: church-website-service
+#
+#service: default
+#runtime: nodejs22  # Adjust this to your Node.js version
+#env: standard
+#instance_class: F2
+#automatic_scaling:
+#  min_instances: 0
+#  max_instances: 1
+#
+#
+#env_variables:
+#  NODE_ENV: 'production'
+#
+#handlers:
+#  - url: /static
+#    static_dir: build/static
+#
+#  - url: /(.*\.(js|css|png|jpg|jpeg|gif|ico|svg|eot|ttf|woff|woff2|json|html))
+#    static_files: build/\1
+#    upload: build/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|eot|ttf|woff|woff2|json|html)  # ✅ Fixed regex issue
+#
+#  - url: /.*
+#    static_files: build/index.html
+#    upload: build/index.html
+#    secure: always
+#    login: required  # This forces users to sign in with Google accounts
