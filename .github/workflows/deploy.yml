@@ -20,6 +20,10 @@ env:
   IMAGE_FRONTEND: ${{ github.repository }}/frontend
   DOCKER_COMPOSE_FILE: docker-compose.hostinger.yml
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     name: Build Docker Images
