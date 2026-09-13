@@ -32,8 +32,8 @@ ufw allow 443/tcp
 ufw --force enable
 
 # --- App directory ---
-mkdir -p /opt/church-website
-cd /opt/church-website
+mkdir -p /opt/church-website-fhbck
+cd /opt/church-website-fhbck
 
 # --- Clone repo (first time) ---
 # Replace YOUR_USER/YOUR_REPO below
@@ -42,7 +42,7 @@ cd /opt/church-website
 git clone git@github.com:YOUR_USER/YOUR_REPO.git .
 
 # --- Write nginx config with real domain ---
-cat > /opt/church-website/nginx/default.conf <<NGINX
+cat > /opt/church-website-fhbck/nginx/default.conf <<NGINX
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;
@@ -92,7 +92,7 @@ certbot certonly --standalone -d "$DOMAIN" -d "www.$DOMAIN" \
   --non-interactive --agree-tos -m "admin@$DOMAIN"
 
 # --- Environment file ---
-cat > /opt/church-website/.env <<ENV
+cat > /opt/church-website-fhbck/.env <<ENV
 JWT_SECRET=$(openssl rand -base64 32)
 DB_PASSWORD=$(openssl rand -base64 18)
 ENV
@@ -113,6 +113,6 @@ echo "    DO_HOST     = $(curl -s ifconfig.me)"
 echo "    DO_USER     = root"
 echo "    DO_SSH_KEY  = (private key that is also a GitHub Deploy Key)"
 echo "    DOMAIN      = $DOMAIN"
-echo "    JWT_SECRET  = see /opt/church-website/.env"
-echo "    DB_PASSWORD = see /opt/church-website/.env"
+echo "    JWT_SECRET  = see /opt/church-website-fhbck/.env"
+echo "    DB_PASSWORD = see /opt/church-website-fhbck/.env"
 echo ""

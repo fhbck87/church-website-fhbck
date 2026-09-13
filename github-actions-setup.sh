@@ -129,11 +129,11 @@ cat << 'SECRETS'
 │                                                                            │
 │  7. DB_PASSWORD                                                           │
 │     Value: (your PostgreSQL password)                                     │
-│     Get from VPS: grep DB_PASSWORD /opt/church-website/.env.production   │
+│     Get from VPS: grep DB_PASSWORD /opt/church-website-fhbck/.env.production │
 │                                                                            │
 │  8. JWT_SECRET                                                            │
 │     Value: (your JWT secret key)                                          │
-│     Get from VPS: grep JWT_SECRET /opt/church-website/.env.production    │
+│     Get from VPS: grep JWT_SECRET /opt/church-website-fhbck/.env.production │
 │                                                                            │
 │  9. REACT_APP_ADMIN_EMAIL                                                 │
 │     Value: admin@fhbckissimmee.org                                        │
@@ -184,7 +184,7 @@ echo ""
 echo -e "${YELLOW}Getting secrets from VPS:${NC}"
 echo ""
 echo "SSH into your VPS and run:"
-echo -e "${GREEN}cat /opt/church-website/.env.production${NC}"
+echo -e "${GREEN}cat /opt/church-website-fhbck/.env.production${NC}"
 echo ""
 echo "This shows all values you need"
 echo ""

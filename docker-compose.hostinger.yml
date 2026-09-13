@@ -39,9 +39,9 @@ services:
       MAIL_HOST: ${MAIL_HOST:-}
       MAIL_USERNAME: ${MAIL_USERNAME:-}
       MAIL_PASSWORD: ${MAIL_PASSWORD:-}
-      MAIL_NOTIFY_TO: ${MAIL_NOTIFY_TO:-info@fhbck.org}
+      MAIL_NOTIFY_TO: ${MAIL_NOTIFY_TO:-info@fhbckissimmee.org}
       UPLOAD_DIR: /app/uploads
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://fhbck.org,http://www.fhbck.org,https://fhbck.org,https://www.fhbck.org}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://fhbckissimmee.org,http://www.fhbckissimmee.org,https://fhbckissimmee.org,https://www.fhbckissimmee.org}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       SPRING_PROFILES_ACTIVE: production
     volumes:

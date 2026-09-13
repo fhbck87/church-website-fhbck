@@ -95,7 +95,7 @@ GETTING SECRETS FROM VPS:
 SSH into VPS and run:
 
 $ ssh root@YOUR_VPS_IP
-$ cat /opt/church-website/.env.production
+$ cat /opt/church-website-fhbck/.env.production
 
 Copy the values you need for GitHub secrets.
 

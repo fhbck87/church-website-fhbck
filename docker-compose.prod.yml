@@ -1,10 +1,10 @@
 # Production overrides: use pre-built images from registry
 services:
   backend:
-    image: ghcr.io/${GITHUB_REPOSITORY:-rodriguemedor/church-website}/backend:latest
+    image: ghcr.io/${GITHUB_REPOSITORY:-fhbck87/church-website-fhbck}/backend:latest
 
   frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY:-rodriguemedor/church-website}/frontend:latest
+    image: ghcr.io/${GITHUB_REPOSITORY:-fhbck87/church-website-fhbck}/frontend:latest
     volumes:
       - ./nginx/default.prod.conf:/etc/nginx/conf.d/default.conf:ro
     ports:

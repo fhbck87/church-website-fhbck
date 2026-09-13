@@ -85,8 +85,8 @@ echo "Run on VPS:"
 echo ""
 cat << 'CLONE_REPO'
 cd /opt
-git clone https://github.com/fhbck87/church-website-fhbck.git church-website
-cd church-website
+git clone https://github.com/fhbck87/church-website-fhbck.git church-website-fhbck
+cd church-website-fhbck
 ls -la
 CLONE_REPO
 

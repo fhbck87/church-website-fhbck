@@ -76,8 +76,8 @@ docker-compose --version
 cd /opt
 
 # Clone repository
-git clone https://github.com/fhbck87/church-website-fhbck.git church-website
-cd church-website
+git clone https://github.com/fhbck87/church-website-fhbck.git church-website-fhbck
+cd church-website-fhbck
 
 # Run automated setup
 sudo ./hostinger-deploy.sh setup

@@ -307,7 +307,7 @@ If GitHub Actions fails, deploy manually:
 ```bash
 # SSH into VPS
 ssh root@YOUR_VPS_IP
-cd /opt/church-website
+cd /opt/church-website-fhbck
 
 # Pull latest code
 git pull origin master
@@ -354,7 +354,7 @@ Workflow automatically backs up database before deployment:
 ```bash
 # SSH into VPS
 ssh root@YOUR_VPS_IP
-cd /opt/church-website
+cd /opt/church-website-fhbck
 
 # Restore from backup
 sudo ./hostinger-deploy.sh restore /opt/backups/backup_pre_deploy_YYYYMMDD_HHMMSS.sql

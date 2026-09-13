@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-DEPLOY_DIR="/opt/church-website"
+DEPLOY_DIR="/opt/church-website-fhbck"
 COMPOSE_FILE="docker-compose.hostinger.yml"
 ENV_FILE=".env.production"
 
