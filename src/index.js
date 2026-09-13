@@ -1,11 +1,32 @@
-// This file is intentionally kept Node-safe because some hosting providers
-// execute the package entry directly. The browser app is bundled from
-// src/client-index.js via config-overrides.js.
+const express = require('express');
+const path = require('path');
 
-if (typeof document !== 'undefined') {
-  console.warn(
-    'The browser entry is loaded via src/client-index.js. This Node-safe stub should not render the app.'
-  );
-}
+const app = express();
+const port = Number(process.env.PORT) || 3000;
+const buildDirectory = path.join(__dirname, '..', 'build');
 
-module.exports = {};
+app.disable('x-powered-by');
+
+app.get('/health', (_request, response) => {
+  response.status(200).json({ status: 'ok' });
+});
+
+app.use(
+  express.static(buildDirectory, {
+    maxAge: '1y',
+    immutable: true,
+    setHeaders(response, filePath) {
+      if (filePath.endsWith('index.html')) {
+        response.setHeader('Cache-Control', 'no-cache');
+      }
+    },
+  })
+);
+
+app.get('*', (_request, response) => {
+  response.sendFile(path.join(buildDirectory, 'index.html'));
+});
+
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Church website listening on port ${port}`);
+});
