@@ -57,7 +57,7 @@
   },
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
-    "start": "cross-env PORT=4000 NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
+    "start": "node production-server.js",
     "dev:server": "node server/index.js",
     "start:server": "node server/index.js",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
