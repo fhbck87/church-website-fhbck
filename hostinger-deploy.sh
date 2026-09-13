@@ -117,15 +117,15 @@ REACT_APP_API_URL=https://yourdomain.com
 # Email Configuration
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
+MAIL_USERNAME=info@fhbckissimmee.org
 MAIL_PASSWORD=your-app-password
-MAIL_NOTIFY_TO=admin@yourdomain.com
+MAIL_NOTIFY_TO=admin@fhbckissimmee.org
 
 # CORS Configuration
-CORS_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+CORS_ORIGINS=https://fhbckissimmee.org,https://www.fhbckissimmee.org
 
 # Admin Credentials (CHANGE IMMEDIATELY AFTER FIRST LOGIN)
-REACT_APP_ADMIN_EMAIL=admin@yourdomain.com
+REACT_APP_ADMIN_EMAIL=info@fhbckissimmee.org
 REACT_APP_ADMIN_PASSWORD=ChangeMe123!
 REACT_APP_ADMIN_NAME=Administrator
 

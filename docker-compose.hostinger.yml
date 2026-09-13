@@ -58,7 +58,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL:-https://fhbck.org}
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-https://fhbckissimmee.org}
         REACT_APP_YOUTUBE_API_KEY: ${REACT_APP_YOUTUBE_API_KEY:-}
         REACT_APP_YOUTUBE_CHANNEL_ID: ${REACT_APP_YOUTUBE_CHANNEL_ID:-}
         REACT_APP_ADMIN_EMAIL: ${REACT_APP_ADMIN_EMAIL:-}

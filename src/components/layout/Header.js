@@ -50,7 +50,7 @@ const StyledAppBar = styled(AppBar, {
   backgroundColor: scrolled
     ? `${alpha(theme.palette.background.paper, 0.88)} !important`
     : 'transparent !important',
-  color: `${scrolled ? theme.palette.text.primary : (theme.palette.mode === 'dark' ? theme.palette.text.primary : '#fff')} !important`,
+  color: `${scrolled ? theme.palette.text.primary : (theme.palette.mode === 'dark' ? theme.palette.text.primary : '#0F4C81')} !important`,
   boxShadow: scrolled ? `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}` : 'none',
   borderBottom: scrolled ? `1px solid ${alpha(theme.palette.divider, 0.12)}` : '1px solid transparent',
   backdropFilter: 'saturate(180%) blur(20px)',
@@ -80,7 +80,7 @@ const NavButton = styled(Button, {
     ? theme.palette.text.primary
     : isDark
       ? '#E2E8F0'
-      : '#ffffff';
+      : '#0F4C81';
   return {
     position: 'relative',
     padding: theme.spacing(0.75, 1.6),
@@ -94,13 +94,13 @@ const NavButton = styled(Button, {
     minWidth: 'unset',
     transition: 'all 0.3s ease',
     '&:hover': {
-      backgroundColor: alpha(scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#ffffff'), 0.1),
-      color: `${scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#ffffff')} !important`,
+      backgroundColor: alpha(scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#0F4C81'), 0.1),
+      color: `${scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#0F4C81')} !important`,
     },
     '&.active': {
-      color: `${scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#ffffff')} !important`,
+      color: `${scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#0F4C81')} !important`,
       fontWeight: 700,
-      backgroundColor: alpha(scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#ffffff'), 0.1),
+      backgroundColor: alpha(scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#0F4C81'), 0.1),
       '&::after': {
         content: '""',
         position: 'absolute',
@@ -109,7 +109,7 @@ const NavButton = styled(Button, {
         transform: 'translateX(-50%)',
         width: '30%',
         height: '2.5px',
-        backgroundColor: scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#ffffff'),
+        backgroundColor: scrolled ? theme.palette.primary.main : (isDark ? '#E2E8F0' : '#0F4C81'),
         borderRadius: '2px',
       },
     },
@@ -445,8 +445,9 @@ const Header = () => {
                   width: 52,
                   height: 52,
                   borderRadius: '50%',
-                  border: `2.5px solid ${alpha(scrolled ? theme.palette.primary.main : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#ffffff'), 0.6)}`,
+                  border: `2.5px solid ${alpha(scrolled ? theme.palette.primary.main : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#0F4C81'), 0.6)}`,
                   p: '3px',
+                  backgroundColor: scrolled ? theme.palette.background.paper : (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)'),
                   transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
                   flexShrink: 0,
                   [theme.breakpoints.up('md')]: { width: 58, height: 58 },
@@ -478,7 +479,7 @@ const Header = () => {
                         : 'linear-gradient(135deg, #0F4C81 0%, #3A7BB8 40%, #C9A227 100%)'
                       : theme.palette.mode === 'dark'
                         ? 'linear-gradient(135deg, #E2E8F0 0%, #D4B445 100%)'
-                        : 'linear-gradient(135deg, #ffffff 0%, #E0C060 100%)',
+                        : 'linear-gradient(135deg, #0F4C81 0%, #3A7BB8 40%, #C9A227 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
@@ -493,7 +494,7 @@ const Header = () => {
                   variant="caption"
                   sx={{
                     display: 'block',
-                    color: scrolled ? 'text.secondary' : alpha(theme.palette.mode === 'dark' ? '#E2E8F0' : '#ffffff', 0.6),
+                    color: scrolled ? 'text.secondary' : alpha(theme.palette.mode === 'dark' ? '#E2E8F0' : '#0F4C81', 0.7),
                     fontSize: '0.68rem',
                     letterSpacing: '1.5px',
                     textTransform: 'uppercase',
@@ -532,14 +533,14 @@ const Header = () => {
                   aria-label="open drawer"
                   onClick={() => setMobileOpen(!mobileOpen)}
                   sx={{
-                    color: scrolled ? 'text.primary' : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#fff'),
+                    color: scrolled ? 'text.primary' : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#0F4C81'),
                     borderRadius: '12px',
-                    border: `1.5px solid ${alpha(scrolled ? theme.palette.divider : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#ffffff'), 0.2)}`,
+                    border: `1.5px solid ${alpha(scrolled ? theme.palette.divider : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#0F4C81'), 0.2)}`,
                     p: '8px',
                     transition: 'all 0.25s ease',
                     '&:hover': {
-                      backgroundColor: alpha(scrolled ? theme.palette.primary.main : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#ffffff'), 0.1),
-                      borderColor: scrolled ? 'primary.main' : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#ffffff'),
+                      backgroundColor: alpha(scrolled ? theme.palette.primary.main : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#0F4C81'), 0.1),
+                      borderColor: scrolled ? 'primary.main' : (theme.palette.mode === 'dark' ? '#E2E8F0' : '#0F4C81'),
                     },
                   }}
                 >

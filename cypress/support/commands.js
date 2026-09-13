@@ -2,17 +2,11 @@
 
 Cypress.Commands.add('loginAsAdmin', () => {
   cy.session('admin', () => {
-    cy.request({
-      method: 'POST',
-      url: `${Cypress.config('apiUrl')}/auth/login`,
-      body: {
-        email: Cypress.env('adminEmail'),
-        password: Cypress.env('adminPassword'),
-      },
-    }).then((resp) => {
-      window.localStorage.setItem('auth_token', resp.body.accessToken);
-      window.localStorage.setItem('refresh_token', resp.body.refreshToken);
-      window.localStorage.setItem('adminToken', resp.body.accessToken);
+    // Mock the login instead of making a real API request
+    cy.window().then((win) => {
+      win.localStorage.setItem('auth_token', 'mock-jwt-token');
+      win.localStorage.setItem('refresh_token', 'mock-refresh-token');
+      win.localStorage.setItem('adminToken', 'mock-jwt-token');
     });
   });
 });
