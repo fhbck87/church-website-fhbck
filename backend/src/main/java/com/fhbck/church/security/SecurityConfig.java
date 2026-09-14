@@ -30,6 +30,12 @@ public class SecurityConfig {
     @Value("${app.cors.allowed-origins:}")
     private String corsOrigins;
 
+    @Value("${APP_SWAGGER_USERNAME:${app.swagger.username:swagger}}")
+    private String swaggerUser;
+
+    @Value("${APP_SWAGGER_PASSWORD:${app.swagger.password:swagger}}")
+    private String swaggerPass;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         List<String> parsed = Arrays.stream(corsOrigins.split(","))
@@ -64,6 +70,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "EDITOR")
                         .anyRequest().authenticated()
                 )
+                .httpBasic(basic -> {})
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -72,6 +79,16 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public org.springframework.security.provisioning.InMemoryUserDetailsManager inMemoryUserDetailsManager(PasswordEncoder encoder) {
+        var user = org.springframework.security.core.userdetails.User
+                .withUsername(swaggerUser)
+                .password(encoder.encode(swaggerPass))
+                .roles("ADMIN")
+                .build();
+        return new org.springframework.security.provisioning.InMemoryUserDetailsManager(user);
     }
 
     @Bean

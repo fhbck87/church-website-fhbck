@@ -120,11 +120,18 @@ jobs:
             
             echo "🚀 Starting deployment to Hostinger VPS..."
             cd /opt/church-website-fhbck
+
+            TARGET_BRANCH="${{ github.ref_name }}"
+            if [ -z "$TARGET_BRANCH" ] || { [ "$TARGET_BRANCH" != "main" ] && [ "$TARGET_BRANCH" != "master" ]; }; then
+              echo "⚠️ Unsupported branch '$TARGET_BRANCH'; defaulting to main"
+              TARGET_BRANCH="main"
+            fi
             
-            # Pull latest code
-            echo "📥 Pulling latest code from GitHub..."
-            git fetch origin
-            git reset --hard origin/master
+            # Pull latest code from the active repository branch
+            echo "📥 Pulling latest code from GitHub on branch: $TARGET_BRANCH"
+            git fetch origin --prune
+            git checkout "$TARGET_BRANCH" || git checkout -B "$TARGET_BRANCH" "origin/$TARGET_BRANCH"
+            git reset --hard "origin/$TARGET_BRANCH"
             git clean -fd
             
             # Login to GitHub Container Registry
@@ -146,6 +153,9 @@ jobs:
             REACT_APP_STRIPE_PUBLISHABLE_KEY=${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
             STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
             MAIL_HOST=${{ secrets.MAIL_HOST }}
+            # Optional: Swagger UI credentials (used for basic auth on /api/swagger-ui)
+            APP_SWAGGER_USERNAME=${{ secrets.APP_SWAGGER_USERNAME }}
+            APP_SWAGGER_PASSWORD=${{ secrets.APP_SWAGGER_PASSWORD }}
             MAIL_PORT=${{ secrets.MAIL_PORT }}
             MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
