@@ -106,6 +106,10 @@ JWT_SECRET=${jwt_secret}
 # Frontend Configuration
 REACT_APP_API_URL=https://yourdomain.com
 
+# Optional: Swagger UI credentials (basic auth for /api/swagger-ui)
+APP_SWAGGER_USERNAME=swagger
+APP_SWAGGER_PASSWORD=ChangeMeSwagger123!
+
 # YouTube Integration (optional)
 # REACT_APP_YOUTUBE_API_KEY=your-api-key
 # REACT_APP_YOUTUBE_CHANNEL_ID=your-channel-id
