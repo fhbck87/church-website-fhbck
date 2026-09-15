@@ -738,8 +738,6 @@
       "email": "Adresse Email",
       "password": "Mot de Passe",
       "signIn": "Connexion",
-      "demo": "Démo: admin@fhbck.org / admin123",
-      "autoFill": "(Auto-remplir)",
       "errorRequired": "Veuillez entrer l'email et le mot de passe",
       "errorInvalid": "Identifiants invalides"
     },

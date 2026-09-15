@@ -742,8 +742,6 @@
       "email": "Email Address",
       "password": "Password",
       "signIn": "Sign In",
-      "demo": "Demo: admin@fhbck.org / admin123",
-      "autoFill": "(Auto-fill)",
       "errorRequired": "Please enter both email and password",
       "errorInvalid": "Invalid credentials"
     },

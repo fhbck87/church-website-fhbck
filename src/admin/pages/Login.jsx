@@ -75,11 +75,6 @@ const Login = () => {
     }
   };
 
-  const quickFill = (pw) => {
-    setEmail('admin@fhbck.org');
-    setPassword(pw || 'admin123');
-  };
-
   return (
     <LoginContainer>
       <LoginPaper elevation={3}>
@@ -126,12 +121,6 @@ const Login = () => {
             sx={{ mt: 3, mb: 2, py: 1.5, borderRadius: 2, textTransform: 'none', fontSize: '1rem' }}>
             {isLoading ? <CircularProgress size={24} color="inherit" /> : t('admin.login.signIn')}
           </Button>
-          <Typography variant="caption" color="textSecondary" textAlign="center" display="block">
-            {t('admin.login.demo')}
-            <Box component="span" sx={{ ml: 1, cursor: 'pointer', textDecoration: 'underline' }} onClick={() => quickFill()}>
-              {t('admin.login.autoFill')}
-            </Box>
-          </Typography>
         </Box>
       </LoginPaper>
     </LoginContainer>
