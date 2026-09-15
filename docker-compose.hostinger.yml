@@ -44,9 +44,6 @@ services:
       CORS_ORIGINS: ${CORS_ORIGINS:-http://fhbckissimmee.org,http://www.fhbckissimmee.org,https://fhbckissimmee.org,https://www.fhbckissimmee.org}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       SPRING_PROFILES_ACTIVE: production
-      # Swagger UI Basic Auth credentials (optional - set in .env.production)
-      APP_SWAGGER_USERNAME: ${APP_SWAGGER_USERNAME:-}
-      APP_SWAGGER_PASSWORD: ${APP_SWAGGER_PASSWORD:-}
     volumes:
       - uploads_data:/app/uploads
       - logs_data:/app/logs
